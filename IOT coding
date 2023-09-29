@@ -1,0 +1,45 @@
+import sounddevice as sd
+import numpy as np
+import paho.mqtt.client as mqtt
+import time
+
+# MQTT settings
+mqtt_broker_address = "your_broker_address"
+mqtt_port = 1883
+mqtt_topic = "noise_level"
+
+# Sampling parameters
+sample_rate = 44100  # Samples per second
+duration = 10  # Recording duration in seconds
+
+# Function to calculate dB from audio data
+def calculate_db(audio_data):
+    rms = np.sqrt(np.mean(np.square(audio_data)))  # Root Mean Square
+    db = 20 * np.log10(rms / 0.0002)  # Reference sound pressure level
+    return db
+
+# MQTT callback functions
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print("Connected to MQTT broker")
+    else:
+        print("Connection to MQTT broker failed")
+
+def on_publish(client, userdata, mid):
+    print("Data published to MQTT")
+
+# Create MQTT client
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_publish = on_publish
+
+# Connect to MQTT broker
+client.connect(mqtt_broker_address, mqtt_port)
+
+# Start recording and publishing
+with sd.InputStream(callback=calculate_db, channels=1, samplerate=sample_rate):
+    print("Monitoring noise level...")
+    while True:
+        db = calculate_db(np.random.random_sample(44100))  # Simulated audio data for testing
+        client.publish(mqtt_topic, str(db))
+        time.sleep(60)  # Publish data every minute (adjust as needed)
