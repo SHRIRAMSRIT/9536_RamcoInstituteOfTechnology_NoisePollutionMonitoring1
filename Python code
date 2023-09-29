@@ -1,0 +1,95 @@
+
+
+import SwiftUI
+
+struct ContentView: View {
+    @State private var isMonitoring = false
+    @State private var noiseLevel = 0.0
+
+    var body: some View {
+        VStack {
+            Text("Current Noise Level: \(noiseLevel) dB")
+                .font(.largeTitle)
+
+            Button(action: {
+                // Start/stop monitoring code here
+                self.isMonitoring.toggle()
+            }) {
+                Text(isMonitoring ? "Stop Monitoring" : "Start Monitoring")
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+        }
+    }
+}
+
+@main
+struct NoiseApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+
+xml
+<!-- activity_main.xml layout file -->
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/noiseLevelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current Noise Level: 0 dB"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/startStopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Monitoring" />
+
+</LinearLayout>
+
+kotlin
+// MainActivity.kt
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
+class MainActivity : AppCompatActivity() {
+    private lateinit var noiseLevelTextView: TextView
+    private lateinit var startStopButton: Button
+    private var isMonitoring = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        noiseLevelTextView = findViewById(R.id.noiseLevelTextView)
+        startStopButton = findViewById(R.id.startStopButton)
+
+        startStopButton.setOnClickListener {
+            // Start/stop monitoring code here
+            isMonitoring = !isMonitoring
+            updateUI()
+        }
+    }
+
+    private fun updateUI() {
+        if (isMonitoring) {
+            startStopButton.text = "Stop Monitoring"
+        } else {
+            startStopButton.text = "Start Monitoring"
+        }
+    }
+}
